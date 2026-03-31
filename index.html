@@ -1,0 +1,2071 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Event Planner</title>
+  <meta name="theme-color" content="#111827" />
+  <style>
+    :root{
+      --bg:#0b1220;
+      --panel:#111827;
+      --panel-2:#172033;
+      --panel-3:#1e293b;
+      --text:#f8fafc;
+      --muted:#94a3b8;
+      --line:#2a364d;
+      --primary:#60a5fa;
+      --primary-2:#3b82f6;
+      --success:#22c55e;
+      --warning:#f59e0b;
+      --danger:#ef4444;
+      --chip:#0f172a;
+      --shadow:0 10px 30px rgba(0,0,0,.28);
+      --radius:18px;
+      --radius-sm:12px;
+      --tap:46px;
+      --max:1480px;
+    }
+
+    body.light{
+      --bg:#f1f5f9;
+      --panel:#ffffff;
+      --panel-2:#f8fafc;
+      --panel-3:#eef2f7;
+      --text:#0f172a;
+      --muted:#64748b;
+      --line:#d9e2ef;
+      --primary:#2563eb;
+      --primary-2:#1d4ed8;
+      --success:#16a34a;
+      --warning:#d97706;
+      --danger:#dc2626;
+      --chip:#f8fafc;
+      --shadow:0 10px 26px rgba(15,23,42,.08);
+    }
+
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      margin:0;
+      font-family:Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background:linear-gradient(180deg,var(--bg), #0f172a 180%);
+      color:var(--text);
+      line-height:1.45;
+    }
+    body.light{background:linear-gradient(180deg,#edf2f7,#f8fafc 180%)}
+    button,input,select,textarea{font:inherit}
+    a{color:inherit}
+
+    .app{
+      max-width:var(--max);
+      margin:0 auto;
+      padding:14px;
+    }
+
+    .top{
+      display:flex;
+      flex-wrap:wrap;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap:14px;
+      margin-bottom:14px;
+    }
+
+    .brand h1{
+      margin:0;
+      font-size:clamp(1.6rem, 3vw, 2.3rem);
+      letter-spacing:-.02em;
+    }
+
+    .muted{color:var(--muted)}
+    .tiny{font-size:.82rem}
+    .hidden{display:none !important}
+
+    .actions{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      width:100%;
+    }
+
+    .btn{
+      min-height:var(--tap);
+      border:none;
+      border-radius:12px;
+      padding:12px 14px;
+      cursor:pointer;
+      font-weight:700;
+      background:linear-gradient(180deg,var(--primary),var(--primary-2));
+      color:white;
+      box-shadow:var(--shadow);
+      transition:.18s ease;
+    }
+    .btn:hover{transform:translateY(-1px)}
+    .btn:active{transform:translateY(0)}
+    .btn.ghost{
+      background:transparent;
+      border:1px solid var(--line);
+      color:var(--text);
+      box-shadow:none;
+    }
+    .btn.danger{
+      background:linear-gradient(180deg,#f87171,var(--danger));
+    }
+    .btn.file{
+      position:relative;
+      overflow:hidden;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+    }
+    .btn.file input{
+      position:absolute;
+      inset:0;
+      opacity:0;
+      cursor:pointer;
+    }
+
+    .card{
+      background:rgba(17,24,39,.94);
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      padding:16px;
+      margin-bottom:14px;
+      box-shadow:var(--shadow);
+      backdrop-filter:blur(8px);
+    }
+    body.light .card{
+      background:rgba(255,255,255,.94);
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns:repeat(4, minmax(0,1fr));
+      gap:14px;
+    }
+
+    .cols{
+      display:grid;
+      grid-template-columns:repeat(2, minmax(0,1fr));
+      gap:14px;
+    }
+
+    .label{
+      display:block;
+      margin-bottom:7px;
+      color:var(--muted);
+      font-size:.92rem;
+      font-weight:600;
+    }
+
+    .input, textarea.input{
+      width:100%;
+      min-height:var(--tap);
+      border:1px solid var(--line);
+      background:var(--panel-2);
+      color:var(--text);
+      border-radius:12px;
+      padding:12px 14px;
+      outline:none;
+    }
+    .input:focus, textarea.input:focus{
+      border-color:var(--primary);
+      box-shadow:0 0 0 3px rgba(96,165,250,.15);
+    }
+    .input.small{min-width:110px}
+    textarea.input{
+      min-height:96px;
+      resize:vertical;
+    }
+
+    .inline{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      align-items:center;
+    }
+
+    .cardHead{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      flex-wrap:wrap;
+      gap:12px;
+      margin-bottom:12px;
+    }
+
+    .cardHead h2{
+      margin:0;
+      font-size:1.14rem;
+    }
+
+    .summaryGrid{
+      display:grid;
+      grid-template-columns:repeat(4, minmax(0,1fr));
+      gap:12px;
+      margin-bottom:16px;
+    }
+
+    .sumBox{
+      background:var(--panel-2);
+      border:1px solid var(--line);
+      border-radius:16px;
+      padding:14px;
+    }
+    .sumLabel{
+      color:var(--muted);
+      font-size:.9rem;
+      margin-bottom:8px;
+      font-weight:700;
+    }
+    .sumValue{
+      font-size:1.55rem;
+      font-weight:900;
+      letter-spacing:-.02em;
+    }
+
+    .progressHead{
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      margin-bottom:8px;
+    }
+    .bar{
+      width:100%;
+      height:12px;
+      border-radius:999px;
+      background:var(--panel-3);
+      border:1px solid var(--line);
+      overflow:hidden;
+    }
+    .barFill{
+      height:100%;
+      width:0%;
+      border-radius:999px;
+      background:linear-gradient(90deg,var(--primary),var(--primary-2));
+      transition:width .25s ease;
+    }
+    .stageProgress{
+      margin-top:10px;
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+    }
+
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      padding:8px 11px;
+      min-height:36px;
+      border-radius:999px;
+      background:var(--chip);
+      border:1px solid var(--line);
+      font-size:.93rem;
+    }
+    .pill.yes{border-color:rgba(34,197,94,.35)}
+    .pill.pending{border-color:rgba(245,158,11,.35)}
+    .pill.no{border-color:rgba(239,68,68,.35)}
+
+    .stats{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      margin-bottom:8px;
+    }
+
+    .list{
+      list-style:none;
+      padding:0;
+      margin:12px 0 0;
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+    }
+
+    .item{
+      background:var(--panel-2);
+      border:1px solid var(--line);
+      border-radius:14px;
+      padding:12px;
+    }
+
+    .itemTop{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap:12px;
+      margin-bottom:8px;
+    }
+
+    .itemTitle{
+      font-weight:800;
+      margin:0 0 4px;
+    }
+
+    .itemMeta{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      color:var(--muted);
+      font-size:.9rem;
+    }
+
+    .itemActions{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+    }
+
+    .chip{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      padding:6px 10px;
+      border:1px solid var(--line);
+      border-radius:999px;
+      background:var(--chip);
+      font-size:.82rem;
+      white-space:nowrap;
+    }
+
+    .empty{
+      text-align:center;
+      padding:22px 12px;
+      border:1px dashed var(--line);
+      border-radius:14px;
+      color:var(--muted);
+      background:rgba(255,255,255,.02);
+    }
+
+    .sectionNote{
+      margin-top:8px;
+    }
+
+    .statusBadge{
+      font-weight:800;
+      font-size:.78rem;
+      padding:5px 8px;
+      border-radius:999px;
+      border:1px solid var(--line);
+    }
+    .status-yes{color:#22c55e}
+    .status-no{color:#ef4444}
+    .status-pending{color:#f59e0b}
+    .status-done{color:#22c55e}
+    .status-open{color:#60a5fa}
+
+    .footer{
+      text-align:center;
+      padding:10px 0 24px;
+    }
+
+    .topbarSticky{
+      position:sticky;
+      top:0;
+      z-index:5;
+    }
+
+    .toolbarCompact{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      margin-top:8px;
+    }
+
+    .tableWrap{
+      overflow:auto;
+    }
+
+    .miniTable{
+      width:100%;
+      border-collapse:collapse;
+      margin-top:10px;
+      font-size:.94rem;
+    }
+    .miniTable th,.miniTable td{
+      border-bottom:1px solid var(--line);
+      padding:10px 8px;
+      text-align:left;
+      vertical-align:top;
+    }
+
+    .drawer,.modal{
+      position:fixed;
+      inset:0;
+      display:none;
+      z-index:60;
+    }
+    .drawer.open,.modal.open{display:block}
+
+    .drawerOverlay,.modalOverlay{
+      position:absolute;
+      inset:0;
+      background:rgba(2,6,23,.62);
+    }
+
+    .drawerPanel{
+      position:absolute;
+      top:0;
+      right:0;
+      width:min(560px, 100%);
+      height:100%;
+      background:var(--panel);
+      border-left:1px solid var(--line);
+      display:flex;
+      flex-direction:column;
+      box-shadow:var(--shadow);
+    }
+
+    .drawerGrab{
+      width:54px;
+      height:5px;
+      background:var(--muted);
+      border-radius:999px;
+      margin:10px auto 2px;
+      display:none;
+      opacity:.45;
+    }
+
+    .drawerHead,.modalHead{
+      padding:16px;
+      border-bottom:1px solid var(--line);
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      align-items:flex-start;
+    }
+
+    .drawerBody,.modalBody{
+      padding:16px;
+      overflow:auto;
+      flex:1;
+    }
+
+    .drawerFoot,.modalFoot{
+      padding:16px;
+      border-top:1px solid var(--line);
+      display:flex;
+      justify-content:flex-end;
+      gap:10px;
+    }
+
+    .iconBtn{
+      min-width:44px;
+      min-height:44px;
+      border-radius:12px;
+      border:1px solid var(--line);
+      background:transparent;
+      color:var(--text);
+      cursor:pointer;
+    }
+
+    .modalPanel{
+      position:relative;
+      width:min(780px, calc(100% - 20px));
+      max-height:92vh;
+      margin:3vh auto 0;
+      background:var(--panel);
+      border:1px solid var(--line);
+      border-radius:20px;
+      overflow:hidden;
+      box-shadow:var(--shadow);
+    }
+
+    .waList{
+      display:grid;
+      gap:10px;
+      margin-top:12px;
+    }
+
+    .langSwitch{
+      display:flex;
+      gap:6px;
+      align-items:center;
+    }
+
+    .autosave{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      font-size:.9rem;
+      color:var(--muted);
+      margin-top:8px;
+    }
+
+    .dot{
+      width:9px;
+      height:9px;
+      border-radius:999px;
+      background:var(--success);
+      box-shadow:0 0 0 4px rgba(34,197,94,.1);
+    }
+
+    .stickyMobileBar{
+      display:none;
+    }
+
+    @media (max-width: 1100px){
+      .grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+      .summaryGrid{grid-template-columns:repeat(2,minmax(0,1fr))}
+      .cols{grid-template-columns:1fr}
+    }
+
+    @media (max-width: 700px){
+      .app{padding:12px 12px 88px}
+      .actions{
+        display:grid;
+        grid-template-columns:1fr 1fr;
+      }
+      .grid,.summaryGrid{grid-template-columns:1fr}
+      .inline{flex-direction:column; align-items:stretch}
+      .input.small,.btn,.iconBtn{width:100%}
+      .card{padding:14px}
+      .itemTop{flex-direction:column}
+      .itemActions{width:100%}
+      .drawerPanel{
+        top:auto;
+        bottom:0;
+        width:100%;
+        height:min(90vh, 780px);
+        border-left:none;
+        border-top:1px solid var(--line);
+        border-top-left-radius:20px;
+        border-top-right-radius:20px;
+      }
+      .drawerGrab{display:block}
+      .drawerFoot,.modalFoot{flex-direction:column-reverse}
+      .modalPanel{
+        width:calc(100% - 12px);
+        margin:1.5vh auto 0;
+        max-height:96vh;
+      }
+      .stickyMobileBar{
+        display:flex;
+        position:fixed;
+        left:10px;
+        right:10px;
+        bottom:10px;
+        z-index:40;
+        gap:8px;
+        padding:10px;
+        background:rgba(15,23,42,.92);
+        border:1px solid var(--line);
+        border-radius:16px;
+        box-shadow:var(--shadow);
+        backdrop-filter:blur(10px);
+      }
+      body.light .stickyMobileBar{background:rgba(255,255,255,.96)}
+      .stickyMobileBar .btn{flex:1}
+    }
+
+    @media print{
+      body{background:#fff;color:#000}
+      .actions,.stickyMobileBar,.drawer,.modal,.footer,.toolbarCompact,.btn,.iconBtn{display:none !important}
+      .card{box-shadow:none;border:1px solid #ddd;background:#fff}
+      .app{max-width:none}
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="top">
+      <div class="brand">
+        <h1 id="brandTitle">Event Planner</h1>
+        <p class="muted" id="brandSubtitle">Wedding • Baptism • Custom • Mobile-first • Premium</p>
+        <div class="autosave">
+          <span class="dot"></span>
+          <span id="saveStatus">Autosaved</span>
+        </div>
+      </div>
+
+      <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
+        <div class="langSwitch">
+          <button id="btnLangRO" class="btn ghost">RO</button>
+          <button id="btnLangEN" class="btn ghost">EN</button>
+        </div>
+        <button id="btnTheme" class="btn ghost">🌙 Theme</button>
+      </div>
+
+      <div class="actions">
+        <button id="btnSave" class="btn">Save</button>
+        <button id="btnPrint" class="btn ghost">Print / PDF</button>
+        <button id="btnGuestsCSV" class="btn ghost">Export Guests CSV</button>
+        <button id="btnICS" class="btn ghost">Export Calendar (.ics)</button>
+        <button id="btnWA" class="btn ghost">WhatsApp RSVP</button>
+        <button id="btnWABulk" class="btn ghost">WhatsApp Bulk</button>
+        <button id="btnExport" class="btn ghost">Export JSON</button>
+        <label class="btn ghost file">
+          <span id="importLabel">Import JSON</span>
+          <input id="fileImport" type="file" accept="application/json" />
+        </label>
+        <button id="btnShare" class="btn ghost">Share Link</button>
+        <button id="btnReset" class="btn danger">Reset</button>
+      </div>
+    </header>
+
+    <section class="card">
+      <div class="grid">
+        <div>
+          <label class="label" id="lblEventType">Tip eveniment</label>
+          <select id="eventType" class="input">
+            <option value="wedding">Wedding</option>
+            <option value="baptism">Baptism</option>
+            <option value="custom">Custom</option>
+          </select>
+        </div>
+        <div>
+          <label class="label" id="lblEventName">Nume eveniment</label>
+          <input id="eventName" class="input" placeholder="ex: Nunta Ana & Mihai" />
+        </div>
+        <div>
+          <label class="label" id="lblEventDate">Data</label>
+          <input id="eventDate" class="input" type="date" />
+        </div>
+        <div>
+          <label class="label" id="lblEventLocation">Locație</label>
+          <input id="eventLocation" class="input" placeholder="ex: Restaurant X, București" />
+        </div>
+      </div>
+
+      <div class="grid" style="margin-top:14px">
+        <div>
+          <label class="label" id="lblTheme">Temă / stil</label>
+          <input id="eventTheme" class="input" placeholder="ex: Elegant, Rustic, Garden" />
+        </div>
+        <div>
+          <label class="label" id="lblHosts">Gazde / organizatori</label>
+          <input id="eventHosts" class="input" placeholder="ex: Ana & Mihai" />
+        </div>
+        <div style="grid-column:span 2">
+          <label class="label" id="lblNotes">Notițe</label>
+          <textarea id="eventNotes" class="input" placeholder="Detalii generale despre eveniment"></textarea>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="summaryGrid">
+        <div class="sumBox">
+          <div class="sumLabel" id="sumLblBudget">Buget actual</div>
+          <div class="sumValue"><span id="sumBudget">0</span> RON</div>
+          <div class="tiny muted"><span id="sumLblPlanned">Planned</span>: <span id="sumPlanned">0</span> RON</div>
+        </div>
+        <div class="sumBox">
+          <div class="sumLabel" id="sumLblYes">Invitați confirmați</div>
+          <div class="sumValue"><span id="sumYes">0</span></div>
+        </div>
+        <div class="sumBox">
+          <div class="sumLabel" id="sumLblPerYes">Cost / confirmat</div>
+          <div class="sumValue"><span id="sumPerYes">0</span> RON</div>
+        </div>
+        <div class="sumBox">
+          <div class="sumLabel" id="sumLblDone">Task-uri completate</div>
+          <div class="sumValue"><span id="sumDone">0</span>/<span id="sumTasks">0</span></div>
+        </div>
+      </div>
+
+      <div class="progressHead">
+        <b id="progressTitle">Progres checklist</b>
+        <span class="muted" id="sumPct">0%</span>
+      </div>
+      <div class="bar"><div id="barFill" class="barFill"></div></div>
+      <div id="stageProgress" class="stageProgress"></div>
+    </section>
+
+    <main class="cols">
+      <section class="card">
+        <div class="cardHead">
+          <h2 id="tasksTitle">Checklist (pe etape)</h2>
+          <div class="inline">
+            <select id="taskStage" class="input small">
+              <option value="6m">6 luni</option>
+              <option value="3m">3 luni</option>
+              <option value="1m">1 lună</option>
+              <option value="1w">Săptămâna</option>
+              <option value="1d">Ziua</option>
+            </select>
+            <input id="taskTitle" class="input" placeholder="Task (ex: contract foto)" />
+            <input id="taskOwner" class="input small" placeholder="Responsabil" />
+            <button id="addTask" class="btn">Adaugă</button>
+          </div>
+        </div>
+
+        <div class="toolbarCompact">
+          <select id="taskFilter" class="input small">
+            <option value="all">Toate etapele</option>
+            <option value="6m">6 luni</option>
+            <option value="3m">3 luni</option>
+            <option value="1m">1 lună</option>
+            <option value="1w">Săptămâna</option>
+            <option value="1d">Ziua</option>
+          </select>
+          <select id="taskStatusFilter" class="input small">
+            <option value="all">Toate statusurile</option>
+            <option value="open">Deschise</option>
+            <option value="done">Completate</option>
+          </select>
+          <input id="taskSearch" class="input" placeholder="Caută task..." />
+        </div>
+
+        <div id="tasksWrap"></div>
+      </section>
+
+      <section class="card">
+        <div class="cardHead">
+          <h2 id="guestsTitle">Invitați</h2>
+          <div class="inline">
+            <input id="guestName" class="input" placeholder="Nume invitat" />
+            <select id="guestStatus" class="input small">
+              <option value="pending">Pending</option>
+              <option value="yes">Confirmat</option>
+              <option value="no">Refuzat</option>
+            </select>
+            <button id="addGuest" class="btn">Adaugă</button>
+          </div>
+        </div>
+
+        <div class="stats">
+          <div class="pill">Total: <b id="gTotal">0</b></div>
+          <div class="pill yes">Confirmed: <b id="gYes">0</b></div>
+          <div class="pill pending">Pending: <b id="gPending">0</b></div>
+          <div class="pill no">Declined: <b id="gNo">0</b></div>
+        </div>
+
+        <div class="toolbarCompact">
+          <input id="guestSearch" class="input" placeholder="Caută invitat..." />
+          <select id="guestSort" class="input small">
+            <option value="name">Sort: Nume</option>
+            <option value="status">Sort: RSVP</option>
+            <option value="group">Sort: Grup</option>
+          </select>
+        </div>
+
+        <ul id="guestsList" class="list"></ul>
+      </section>
+
+      <section class="card">
+        <div class="cardHead">
+          <h2 id="budgetTitle">Buget (Planned vs Actual)</h2>
+          <div class="inline">
+            <input id="budgetCat" class="input" placeholder="Categorie (ex: locație)" />
+            <input id="budgetPlan" class="input small" type="number" min="0" placeholder="Planned" />
+            <input id="budgetAct" class="input small" type="number" min="0" placeholder="Actual" />
+            <button id="addBudget" class="btn">Adaugă</button>
+          </div>
+        </div>
+        <ul id="budgetList" class="list"></ul>
+      </section>
+
+      <section class="card">
+        <div class="cardHead">
+          <h2 id="timelineTitle">Timeline</h2>
+          <div class="inline">
+            <input id="timeAt" class="input small" type="time" />
+            <input id="timeWhat" class="input" placeholder="Activitate (ex: cununie civilă)" />
+            <input id="timeDur" class="input small" type="number" min="5" step="5" placeholder="Durată (min)" />
+            <button id="addTime" class="btn">Adaugă</button>
+          </div>
+        </div>
+        <ul id="timelineList" class="list"></ul>
+      </section>
+
+      <section class="card">
+        <div class="cardHead">
+          <h2 id="vendorsTitle">Furnizori (Planned/Actual + scadențe)</h2>
+          <div class="inline">
+            <input id="vName" class="input" placeholder="Nume (ex: Foto Studio X)" />
+            <input id="vService" class="input" placeholder="Serviciu (ex: foto/video)" />
+            <button id="addVendor" class="btn">Adaugă</button>
+          </div>
+        </div>
+
+        <ul id="vendorsList" class="list"></ul>
+        <div id="vendorTotals" class="sectionNote muted"></div>
+      </section>
+
+      <section class="card">
+        <div class="cardHead">
+          <h2 id="ideasTitle">Sugestii de îmbunătățire</h2>
+        </div>
+        <div class="tableWrap">
+          <table class="miniTable">
+            <thead>
+              <tr>
+                <th>Feature</th>
+                <th>Prioritate</th>
+                <th>Descriere</th>
+              </tr>
+            </thead>
+            <tbody id="ideasTable"></tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer muted">
+      <span id="footerText">Autosave • CSV/JSON/Share Link • ICS timezone • WhatsApp Bulk • Print/PDF • RO/EN • Theme</span>
+    </footer>
+  </div>
+
+  <div class="stickyMobileBar">
+    <button id="mobileQuickTask" class="btn ghost">+ Task</button>
+    <button id="mobileQuickGuest" class="btn">+ Guest</button>
+  </div>
+
+  <div id="drawer" class="drawer" aria-hidden="true">
+    <div class="drawerOverlay" data-close="1"></div>
+    <aside class="drawerPanel" role="dialog" aria-modal="true" aria-labelledby="drawerTitle">
+      <div class="drawerGrab" aria-hidden="true"></div>
+      <div class="drawerHead">
+        <div>
+          <div id="drawerKicker" class="muted tiny">Editare</div>
+          <h3 id="drawerTitle" style="margin:6px 0 0">Detalii</h3>
+        </div>
+        <button id="drawerX" class="iconBtn" aria-label="Închide">✕</button>
+      </div>
+      <form id="drawerForm" class="drawerBody"></form>
+      <div class="drawerFoot">
+        <button id="drawerCancel" class="btn ghost" type="button">Anulează</button>
+        <button id="drawerSave" class="btn" type="button">Salvează</button>
+      </div>
+    </aside>
+  </div>
+
+  <div id="waModal" class="modal" aria-hidden="true">
+    <div class="modalOverlay" data-close="1"></div>
+    <div class="modalPanel" role="dialog" aria-modal="true" aria-labelledby="waTitle">
+      <div class="modalHead">
+        <div>
+          <div class="muted tiny">WhatsApp Bulk</div>
+          <h3 id="waTitle" style="margin:6px 0 0">Invitați “Pending”</h3>
+        </div>
+        <button id="waClose" class="iconBtn" aria-label="Închide">✕</button>
+      </div>
+      <div class="modalBody">
+        <div class="inline" style="justify-content:space-between">
+          <button id="waCopyMsg" class="btn ghost">Copiază mesaj template</button>
+          <button id="waCopyAll" class="btn">Copiază toate link-urile</button>
+        </div>
+        <div class="muted tiny" style="margin-top:10px" id="waTip">
+          Tip: apasă pe fiecare link ca să se deschidă WhatsApp către invitatul respectiv.
+        </div>
+        <div id="waList" class="waList"></div>
+      </div>
+      <div class="modalFoot">
+        <button id="waDone" class="btn">Gata</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const STORAGE_KEY = "event-planner-pro-v1";
+
+    const i18n = {
+      ro: {
+        htmlLang: "ro",
+        brandSubtitle: "Nuntă • Botez • Custom • Mobile-first • Premium",
+        autosaved: "Autosalvat",
+        theme: "Temă",
+        save: "Salvează",
+        print: "Print / PDF",
+        exportGuestsCsv: "Export Guests CSV",
+        exportCalendar: "Export Calendar (.ics)",
+        whatsappRsvp: "WhatsApp RSVP",
+        whatsappBulk: "WhatsApp Bulk",
+        exportJson: "Export JSON",
+        importJson: "Import JSON",
+        shareLink: "Share Link",
+        reset: "Reset",
+        eventType: "Tip eveniment",
+        eventName: "Nume eveniment",
+        eventDate: "Data",
+        eventLocation: "Locație",
+        eventTheme: "Temă / stil",
+        eventHosts: "Gazde / organizatori",
+        notes: "Notițe",
+        currentBudget: "Buget actual",
+        planned: "Planificat",
+        confirmedGuests: "Invitați confirmați",
+        costPerConfirmed: "Cost / confirmat",
+        completedTasks: "Task-uri completate",
+        checklistProgress: "Progres checklist",
+        tasksTitle: "Checklist (pe etape)",
+        guestsTitle: "Invitați",
+        budgetTitle: "Buget (Planned vs Actual)",
+        timelineTitle: "Timeline",
+        vendorsTitle: "Furnizori (Planned/Actual + scadențe)",
+        ideasTitle: "Sugestii de îmbunătățire",
+        footerText: "Autosave • CSV/JSON/Share Link • ICS timezone • WhatsApp Bulk • Print/PDF • RO/EN • Temă",
+        allStages: "Toate etapele",
+        allStatuses: "Toate statusurile",
+        open: "Deschise",
+        done: "Completate",
+        searchTask: "Caută task...",
+        searchGuest: "Caută invitat...",
+        add: "Adaugă",
+        owner: "Responsabil",
+        guestName: "Nume invitat",
+        category: "Categorie (ex: locație)",
+        actual: "Actual",
+        activity: "Activitate (ex: cununie civilă)",
+        duration: "Durată (min)",
+        vendorName: "Nume (ex: Foto Studio X)",
+        vendorService: "Serviciu (ex: foto/video)",
+        close: "Închide",
+        cancel: "Anulează",
+        details: "Detalii",
+        edit: "Editează",
+        remove: "Șterge",
+        yes: "Confirmat",
+        no: "Refuzat",
+        pending: "Pending",
+        day: "Ziua",
+        week: "Săptămâna",
+        month1: "1 lună",
+        month3: "3 luni",
+        month6: "6 luni",
+        copied: "Copiat",
+        emptyTasks: "Nu există task-uri încă.",
+        emptyGuests: "Nu există invitați încă.",
+        emptyBudget: "Nu există linii de buget încă.",
+        emptyTimeline: "Nu există elemente în timeline încă.",
+        emptyVendors: "Nu există furnizori încă.",
+        resetConfirm: "Sigur vrei să resetezi toate datele?",
+        invalidImport: "Fișier JSON invalid.",
+        importedOk: "Import realizat cu succes.",
+        shareSoon: "Share link demo. Poți implementa ulterior Web Share API sau backend.",
+        waTip: "Tip: apasă pe fiecare link ca să se deschidă WhatsApp către invitatul respectiv.",
+        drawerEdit: "Editare",
+        quickTask: "+ Task",
+        quickGuest: "+ Invitat",
+        priority: "Prioritate",
+        description: "Descriere",
+        feature: "Feature"
+      },
+      en: {
+        htmlLang: "en",
+        brandSubtitle: "Wedding • Baptism • Custom • Mobile-first • Premium",
+        autosaved: "Autosaved",
+        theme: "Theme",
+        save: "Save",
+        print: "Print / PDF",
+        exportGuestsCsv: "Export Guests CSV",
+        exportCalendar: "Export Calendar (.ics)",
+        whatsappRsvp: "WhatsApp RSVP",
+        whatsappBulk: "WhatsApp Bulk",
+        exportJson: "Export JSON",
+        importJson: "Import JSON",
+        shareLink: "Share Link",
+        reset: "Reset",
+        eventType: "Event type",
+        eventName: "Event name",
+        eventDate: "Date",
+        eventLocation: "Location",
+        eventTheme: "Theme / style",
+        eventHosts: "Hosts / organizers",
+        notes: "Notes",
+        currentBudget: "Current budget",
+        planned: "Planned",
+        confirmedGuests: "Confirmed guests",
+        costPerConfirmed: "Cost / confirmed",
+        completedTasks: "Completed tasks",
+        checklistProgress: "Checklist progress",
+        tasksTitle: "Checklist (by stage)",
+        guestsTitle: "Guests",
+        budgetTitle: "Budget (Planned vs Actual)",
+        timelineTitle: "Timeline",
+        vendorsTitle: "Vendors (Planned/Actual + due dates)",
+        ideasTitle: "Improvement suggestions",
+        footerText: "Autosave • CSV/JSON/Share Link • ICS timezone • WhatsApp Bulk • Print/PDF • RO/EN • Theme",
+        allStages: "All stages",
+        allStatuses: "All statuses",
+        open: "Open",
+        done: "Completed",
+        searchTask: "Search task...",
+        searchGuest: "Search guest...",
+        add: "Add",
+        owner: "Owner",
+        guestName: "Guest name",
+        category: "Category (e.g. venue)",
+        actual: "Actual",
+        activity: "Activity (e.g. civil ceremony)",
+        duration: "Duration (min)",
+        vendorName: "Name (e.g. Photo Studio X)",
+        vendorService: "Service (e.g. photo/video)",
+        close: "Close",
+        cancel: "Cancel",
+        details: "Details",
+        edit: "Edit",
+        remove: "Delete",
+        yes: "Confirmed",
+        no: "Declined",
+        pending: "Pending",
+        day: "Day",
+        week: "Week",
+        month1: "1 month",
+        month3: "3 months",
+        month6: "6 months",
+        copied: "Copied",
+        emptyTasks: "No tasks yet.",
+        emptyGuests: "No guests yet.",
+        emptyBudget: "No budget lines yet.",
+        emptyTimeline: "No timeline items yet.",
+        emptyVendors: "No vendors yet.",
+        resetConfirm: "Are you sure you want to reset all data?",
+        invalidImport: "Invalid JSON file.",
+        importedOk: "Import completed successfully.",
+        shareSoon: "Demo share link. You can later implement Web Share API or a backend.",
+        waTip: "Tip: tap each link to open WhatsApp for that specific guest.",
+        drawerEdit: "Edit",
+        quickTask: "+ Task",
+        quickGuest: "+ Guest",
+        priority: "Priority",
+        description: "Description",
+        feature: "Feature"
+      }
+    };
+
+    const defaultData = () => ({
+      lang: "ro",
+      theme: "dark",
+      event: {
+        type: "wedding",
+        name: "",
+        date: "",
+        location: "",
+        theme: "",
+        hosts: "",
+        notes: ""
+      },
+      tasks: [
+        {id:id(), stage:"6m", title:"Book venue", owner:"", done:false, notes:""},
+        {id:id(), stage:"3m", title:"Choose photographer", owner:"", done:false, notes:""},
+        {id:id(), stage:"1m", title:"Confirm menu", owner:"", done:false, notes:""}
+      ],
+      guests: [],
+      budget: [],
+      timeline: [],
+      vendors: [],
+      ui: {
+        taskFilter:"all",
+        taskStatusFilter:"all",
+        taskSearch:"",
+        guestSearch:"",
+        guestSort:"name"
+      }
+    });
+
+    let state = loadState();
+
+    const ideas = [
+      ["Public RSVP Page", "High", "Public form for guests to confirm attendance without login."],
+      ["Seating Chart", "High", "Create tables and assign guests visually."],
+      ["Reminders", "High", "Task and payment reminders with overdue badges."],
+      ["Guest Groups", "Medium", "Family, friends, colleagues, VIP, bride side, groom side."],
+      ["Meal Preferences", "Medium", "Track vegetarian, vegan and allergy requirements."],
+      ["Vendor Contracts", "Medium", "Upload contracts, invoices and receipts."],
+      ["Budget Charts", "Medium", "Planned vs actual charts by category."],
+      ["Dark / Light Theme", "Done", "Built-in theme toggle included."],
+      ["Multi-language", "Done", "RO / EN toggle included."],
+      ["Cloud Sync", "Future", "Store events online with accounts and collaboration."],
+      ["QR Guest Check-in", "Future", "Scan invitations at venue entrance."],
+      ["PWA Installable App", "Future", "Install on phone and use offline."]
+    ];
+
+    const $ = (s) => document.querySelector(s);
+    const $$ = (s) => [...document.querySelectorAll(s)];
+
+    function id(){
+      return Math.random().toString(36).slice(2,10) + Date.now().toString(36).slice(-4);
+    }
+
+    function loadState(){
+      try{
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if(!raw) return defaultData();
+        const parsed = JSON.parse(raw);
+        return mergeDefaults(defaultData(), parsed);
+      }catch{
+        return defaultData();
+      }
+    }
+
+    function mergeDefaults(base, incoming){
+      const out = structuredClone(base);
+      for(const key in incoming){
+        if(typeof incoming[key] === "object" && incoming[key] && !Array.isArray(incoming[key]) && out[key]){
+          out[key] = {...out[key], ...incoming[key]};
+        }else{
+          out[key] = incoming[key];
+        }
+      }
+      return out;
+    }
+
+    function saveState(){
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      $("#saveStatus").textContent = t("autosaved") + " • " + new Date().toLocaleTimeString([], {hour:"2-digit", minute:"2-digit"});
+    }
+
+    function t(key){
+      return i18n[state.lang][key] || key;
+    }
+
+    function fmtCurrency(n){
+      return Number(n || 0).toLocaleString(undefined, {maximumFractionDigits:0});
+    }
+
+    function esc(str=""){
+      return String(str)
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;");
+    }
+
+    function stageLabel(v){
+      const map = {
+        "6m": t("month6"),
+        "3m": t("month3"),
+        "1m": t("month1"),
+        "1w": t("week"),
+        "1d": t("day")
+      };
+      return map[v] || v;
+    }
+
+    function applyTheme(){
+      document.body.classList.toggle("light", state.theme === "light");
+      $("#btnTheme").textContent = state.theme === "light" ? "☀️ " + t("theme") : "🌙 " + t("theme");
+    }
+
+    function applyTranslations(){
+      document.documentElement.lang = i18n[state.lang].htmlLang;
+      $("#brandSubtitle").textContent = t("brandSubtitle");
+      $("#saveStatus").textContent = t("autosaved");
+      $("#btnSave").textContent = t("save");
+      $("#btnPrint").textContent = t("print");
+      $("#btnGuestsCSV").textContent = t("exportGuestsCsv");
+      $("#btnICS").textContent = t("exportCalendar");
+      $("#btnWA").textContent = t("whatsappRsvp");
+      $("#btnWABulk").textContent = t("whatsappBulk");
+      $("#btnExport").textContent = t("exportJson");
+      $("#importLabel").textContent = t("importJson");
+      $("#btnShare").textContent = t("shareLink");
+      $("#btnReset").textContent = t("reset");
+      $("#lblEventType").textContent = t("eventType");
+      $("#lblEventName").textContent = t("eventName");
+      $("#lblEventDate").textContent = t("eventDate");
+      $("#lblEventLocation").textContent = t("eventLocation");
+      $("#lblTheme").textContent = t("eventTheme");
+      $("#lblHosts").textContent = t("eventHosts");
+      $("#lblNotes").textContent = t("notes");
+      $("#sumLblBudget").textContent = t("currentBudget");
+      $("#sumLblPlanned").textContent = t("planned");
+      $("#sumLblYes").textContent = t("confirmedGuests");
+      $("#sumLblPerYes").textContent = t("costPerConfirmed");
+      $("#sumLblDone").textContent = t("completedTasks");
+      $("#progressTitle").textContent = t("checklistProgress");
+      $("#tasksTitle").textContent = t("tasksTitle");
+      $("#guestsTitle").textContent = t("guestsTitle");
+      $("#budgetTitle").textContent = t("budgetTitle");
+      $("#timelineTitle").textContent = t("timelineTitle");
+      $("#vendorsTitle").textContent = t("vendorsTitle");
+      $("#ideasTitle").textContent = t("ideasTitle");
+      $("#footerText").textContent = t("footerText");
+      $("#taskSearch").placeholder = t("searchTask");
+      $("#guestSearch").placeholder = t("searchGuest");
+      $("#taskOwner").placeholder = t("owner");
+      $("#guestName").placeholder = t("guestName");
+      $("#budgetCat").placeholder = t("category");
+      $("#budgetAct").placeholder = t("actual");
+      $("#timeWhat").placeholder = t("activity");
+      $("#timeDur").placeholder = t("duration");
+      $("#vName").placeholder = t("vendorName");
+      $("#vService").placeholder = t("vendorService");
+      $("#drawerKicker").textContent = t("drawerEdit");
+      $("#drawerTitle").textContent = t("details");
+      $("#drawerCancel").textContent = t("cancel");
+      $("#drawerSave").textContent = t("save");
+      $("#waTip").textContent = t("waTip");
+      $("#waDone").textContent = state.lang === "ro" ? "Gata" : "Done";
+      $("#waCopyMsg").textContent = state.lang === "ro" ? "Copiază mesaj template" : "Copy message template";
+      $("#waCopyAll").textContent = state.lang === "ro" ? "Copiază toate link-urile" : "Copy all links";
+      $("#mobileQuickTask").textContent = t("quickTask");
+      $("#mobileQuickGuest").textContent = t("quickGuest");
+
+      $("#taskFilter").innerHTML = `
+        <option value="all">${t("allStages")}</option>
+        <option value="6m">${stageLabel("6m")}</option>
+        <option value="3m">${stageLabel("3m")}</option>
+        <option value="1m">${stageLabel("1m")}</option>
+        <option value="1w">${stageLabel("1w")}</option>
+        <option value="1d">${stageLabel("1d")}</option>
+      `;
+      $("#taskFilter").value = state.ui.taskFilter;
+
+      $("#taskStatusFilter").innerHTML = `
+        <option value="all">${t("allStatuses")}</option>
+        <option value="open">${t("open")}</option>
+        <option value="done">${t("done")}</option>
+      `;
+      $("#taskStatusFilter").value = state.ui.taskStatusFilter;
+
+      $("#taskStage").innerHTML = `
+        <option value="6m">${stageLabel("6m")}</option>
+        <option value="3m">${stageLabel("3m")}</option>
+        <option value="1m">${stageLabel("1m")}</option>
+        <option value="1w">${stageLabel("1w")}</option>
+        <option value="1d">${stageLabel("1d")}</option>
+      `;
+
+      $("#guestStatus").innerHTML = `
+        <option value="pending">${t("pending")}</option>
+        <option value="yes">${t("yes")}</option>
+        <option value="no">${t("no")}</option>
+      `;
+
+      $("#guestSort").innerHTML = `
+        <option value="name">${state.lang === "ro" ? "Sort: Nume" : "Sort: Name"}</option>
+        <option value="status">${state.lang === "ro" ? "Sort: RSVP" : "Sort: RSVP"}</option>
+        <option value="group">${state.lang === "ro" ? "Sort: Grup" : "Sort: Group"}</option>
+      `;
+      $("#guestSort").value = state.ui.guestSort;
+
+      renderIdeas();
+    }
+
+    function fillForm(){
+      $("#eventType").value = state.event.type;
+      $("#eventName").value = state.event.name;
+      $("#eventDate").value = state.event.date;
+      $("#eventLocation").value = state.event.location;
+      $("#eventTheme").value = state.event.theme;
+      $("#eventHosts").value = state.event.hosts;
+      $("#eventNotes").value = state.event.notes;
+      $("#taskSearch").value = state.ui.taskSearch;
+      $("#guestSearch").value = state.ui.guestSearch;
+    }
+
+    function renderSummary(){
+      const planned = state.budget.reduce((a,b)=>a + Number(b.planned || 0), 0);
+      const actual = state.budget.reduce((a,b)=>a + Number(b.actual || 0), 0);
+      const yes = state.guests.filter(g=>g.status==="yes").length;
+      const done = state.tasks.filter(t=>t.done).length;
+      const totalTasks = state.tasks.length;
+      const pct = totalTasks ? Math.round((done / totalTasks) * 100) : 0;
+      const perYes = yes ? Math.round(actual / yes) : 0;
+
+      $("#sumBudget").textContent = fmtCurrency(actual);
+      $("#sumPlanned").textContent = fmtCurrency(planned);
+      $("#sumYes").textContent = yes;
+      $("#sumPerYes").textContent = fmtCurrency(perYes);
+      $("#sumDone").textContent = done;
+      $("#sumTasks").textContent = totalTasks;
+      $("#sumPct").textContent = pct + "%";
+      $("#barFill").style.width = pct + "%";
+
+      const stages = ["6m","3m","1m","1w","1d"];
+      $("#stageProgress").innerHTML = stages.map(s=>{
+        const items = state.tasks.filter(t=>t.stage===s);
+        const doneS = items.filter(x=>x.done).length;
+        const pctS = items.length ? Math.round(doneS/items.length*100) : 0;
+        return `<span class="pill">${esc(stageLabel(s))}: <b>${pctS}%</b></span>`;
+      }).join("");
+
+      $("#gTotal").textContent = state.guests.length;
+      $("#gYes").textContent = yes;
+      $("#gPending").textContent = state.guests.filter(g=>g.status==="pending").length;
+      $("#gNo").textContent = state.guests.filter(g=>g.status==="no").length;
+    }
+
+    function renderTasks(){
+      const filter = state.ui.taskFilter;
+      const statusFilter = state.ui.taskStatusFilter;
+      const q = state.ui.taskSearch.trim().toLowerCase();
+
+      let tasks = [...state.tasks];
+      if(filter !== "all") tasks = tasks.filter(t=>t.stage === filter);
+      if(statusFilter === "open") tasks = tasks.filter(t=>!t.done);
+      if(statusFilter === "done") tasks = tasks.filter(t=>t.done);
+      if(q) tasks = tasks.filter(t =>
+        t.title.toLowerCase().includes(q) ||
+        (t.owner || "").toLowerCase().includes(q) ||
+        (t.notes || "").toLowerCase().includes(q)
+      );
+
+      const wrap = $("#tasksWrap");
+      if(!tasks.length){
+        wrap.innerHTML = `<div class="empty">${esc(t("emptyTasks"))}</div>`;
+        return;
+      }
+
+      wrap.innerHTML = `<ul class="list">${
+        tasks.map(task => `
+          <li class="item">
+            <div class="itemTop">
+              <div>
+                <div class="itemTitle">${esc(task.title)}</div>
+                <div class="itemMeta">
+                  <span class="chip">${esc(stageLabel(task.stage))}</span>
+                  <span class="chip">${esc(t("owner"))}: ${esc(task.owner || "-")}</span>
+                  <span class="statusBadge ${task.done ? 'status-done' : 'status-open'}">${task.done ? t("done") : t("open")}</span>
+                </div>
+              </div>
+              <div class="itemActions">
+                <button class="btn ghost" onclick="toggleTask('${task.id}')">${task.done ? t("open") : t("done")}</button>
+                <button class="btn ghost" onclick="editTask('${task.id}')">${t("edit")}</button>
+                <button class="btn danger" onclick="deleteTask('${task.id}')">${t("remove")}</button>
+              </div>
+            </div>
+            ${task.notes ? `<div class="muted tiny">${esc(task.notes)}</div>` : ""}
+          </li>
+        `).join("")
+      }</ul>`;
+    }
+
+    function renderGuests(){
+      let guests = [...state.guests];
+      const q = state.ui.guestSearch.trim().toLowerCase();
+      if(q) guests = guests.filter(g =>
+        g.name.toLowerCase().includes(q) ||
+        (g.group || "").toLowerCase().includes(q) ||
+        (g.phone || "").toLowerCase().includes(q) ||
+        (g.email || "").toLowerCase().includes(q)
+      );
+
+      if(state.ui.guestSort === "name"){
+        guests.sort((a,b)=>a.name.localeCompare(b.name));
+      }else if(state.ui.guestSort === "status"){
+        const order = {yes:0, pending:1, no:2};
+        guests.sort((a,b)=>order[a.status]-order[b.status] || a.name.localeCompare(b.name));
+      }else{
+        guests.sort((a,b)=>(a.group || "").localeCompare(b.group || "") || a.name.localeCompare(b.name));
+      }
+
+      const list = $("#guestsList");
+      if(!guests.length){
+        list.innerHTML = `<li class="empty">${esc(t("emptyGuests"))}</li>`;
+        return;
+      }
+
+      list.innerHTML = guests.map(g => `
+        <li class="item">
+          <div class="itemTop">
+            <div>
+              <div class="itemTitle">${esc(g.name)}</div>
+              <div class="itemMeta">
+                <span class="statusBadge status-${g.status}">${esc(statusLabel(g.status))}</span>
+                <span class="chip">${state.lang === "ro" ? "Grup" : "Group"}: ${esc(g.group || "-")}</span>
+                <span class="chip">+1: ${g.plusOne ? "Yes" : "No"}</span>
+                <span class="chip">${state.lang === "ro" ? "Adulți" : "Adults"}: ${g.adults || 1}</span>
+                <span class="chip">${state.lang === "ro" ? "Copii" : "Children"}: ${g.children || 0}</span>
+              </div>
+            </div>
+            <div class="itemActions">
+              <button class="btn ghost" onclick="cycleGuestStatus('${g.id}')">${state.lang === "ro" ? "Schimbă RSVP" : "Cycle RSVP"}</button>
+              <button class="btn ghost" onclick="editGuest('${g.id}')">${t("edit")}</button>
+              <button class="btn danger" onclick="deleteGuest('${g.id}')">${t("remove")}</button>
+            </div>
+          </div>
+          <div class="itemMeta">
+            <span>${esc(g.phone || "-")}</span>
+            <span>${esc(g.email || "-")}</span>
+            <span>${esc(g.menu || "-")}</span>
+            <span>${esc(g.allergies || "-")}</span>
+          </div>
+          ${g.notes ? `<div class="muted tiny" style="margin-top:8px">${esc(g.notes)}</div>` : ""}
+        </li>
+      `).join("");
+    }
+
+    function renderBudget(){
+      const list = $("#budgetList");
+      if(!state.budget.length){
+        list.innerHTML = `<li class="empty">${esc(t("emptyBudget"))}</li>`;
+        return;
+      }
+
+      list.innerHTML = state.budget.map(b => {
+        const diff = Number(b.actual || 0) - Number(b.planned || 0);
+        const diffText = diff > 0 ? `+${fmtCurrency(diff)}` : fmtCurrency(diff);
+        return `
+          <li class="item">
+            <div class="itemTop">
+              <div>
+                <div class="itemTitle">${esc(b.category)}</div>
+                <div class="itemMeta">
+                  <span class="chip">${t("planned")}: ${fmtCurrency(b.planned)} RON</span>
+                  <span class="chip">${t("actual")}: ${fmtCurrency(b.actual)} RON</span>
+                  <span class="chip">${state.lang === "ro" ? "Diferență" : "Difference"}: ${diffText} RON</span>
+                </div>
+              </div>
+              <div class="itemActions">
+                <button class="btn ghost" onclick="editBudget('${b.id}')">${t("edit")}</button>
+                <button class="btn danger" onclick="deleteBudget('${b.id}')">${t("remove")}</button>
+              </div>
+            </div>
+          </li>
+        `;
+      }).join("");
+    }
+
+    function renderTimeline(){
+      const list = $("#timelineList");
+      if(!state.timeline.length){
+        list.innerHTML = `<li class="empty">${esc(t("emptyTimeline"))}</li>`;
+        return;
+      }
+      const sorted = [...state.timeline].sort((a,b)=>(a.at || "").localeCompare(b.at || ""));
+      list.innerHTML = sorted.map(item => `
+        <li class="item">
+          <div class="itemTop">
+            <div>
+              <div class="itemTitle">${esc(item.at)} • ${esc(item.what)}</div>
+              <div class="itemMeta">
+                <span class="chip">${state.lang === "ro" ? "Durată" : "Duration"}: ${esc(String(item.duration || 0))} min</span>
+              </div>
+            </div>
+            <div class="itemActions">
+              <button class="btn ghost" onclick="editTimeline('${item.id}')">${t("edit")}</button>
+              <button class="btn danger" onclick="deleteTimeline('${item.id}')">${t("remove")}</button>
+            </div>
+          </div>
+          ${item.notes ? `<div class="muted tiny">${esc(item.notes)}</div>` : ""}
+        </li>
+      `).join("");
+    }
+
+    function renderVendors(){
+      const list = $("#vendorsList");
+      if(!state.vendors.length){
+        list.innerHTML = `<li class="empty">${esc(t("emptyVendors"))}</li>`;
+        $("#vendorTotals").textContent = "";
+        return;
+      }
+
+      list.innerHTML = state.vendors.map(v => `
+        <li class="item">
+          <div class="itemTop">
+            <div>
+              <div class="itemTitle">${esc(v.name)}</div>
+              <div class="itemMeta">
+                <span class="chip">${esc(v.service || "-")}</span>
+                <span class="chip">${state.lang === "ro" ? "Status" : "Status"}: ${esc(v.status || "booked")}</span>
+                <span class="chip">${t("planned")}: ${fmtCurrency(v.planned)} RON</span>
+                <span class="chip">${t("actual")}: ${fmtCurrency(v.actual)} RON</span>
+                <span class="chip">${state.lang === "ro" ? "Scadență" : "Due"}: ${esc(v.dueDate || "-")}</span>
+              </div>
+            </div>
+            <div class="itemActions">
+              <button class="btn ghost" onclick="editVendor('${v.id}')">${t("edit")}</button>
+              <button class="btn danger" onclick="deleteVendor('${v.id}')">${t("remove")}</button>
+            </div>
+          </div>
+          <div class="itemMeta">
+            <span>${esc(v.phone || "-")}</span>
+            <span>${esc(v.email || "-")}</span>
+          </div>
+          ${v.notes ? `<div class="muted tiny" style="margin-top:8px">${esc(v.notes)}</div>` : ""}
+        </li>
+      `).join("");
+
+      const planned = state.vendors.reduce((a,v)=>a + Number(v.planned || 0), 0);
+      const actual = state.vendors.reduce((a,v)=>a + Number(v.actual || 0), 0);
+      $("#vendorTotals").textContent = (state.lang === "ro" ? "Total furnizori" : "Vendor totals") + ` • ${t("planned")}: ${fmtCurrency(planned)} RON • ${t("actual")}: ${fmtCurrency(actual)} RON`;
+    }
+
+    function renderIdeas(){
+      $("#ideasTable").innerHTML = ideas.map(row => `
+        <tr>
+          <td>${esc(row[0])}</td>
+          <td>${esc(row[1])}</td>
+          <td>${esc(row[2])}</td>
+        </tr>
+      `).join("");
+      const head = $$(".miniTable thead th");
+      if(head.length === 3){
+        head[0].textContent = t("feature");
+        head[1].textContent = t("priority");
+        head[2].textContent = t("description");
+      }
+    }
+
+    function renderAll(){
+      applyTheme();
+      applyTranslations();
+      fillForm();
+      renderSummary();
+      renderTasks();
+      renderGuests();
+      renderBudget();
+      renderTimeline();
+      renderVendors();
+    }
+
+    function syncEventFields(){
+      state.event.type = $("#eventType").value;
+      state.event.name = $("#eventName").value.trim();
+      state.event.date = $("#eventDate").value;
+      state.event.location = $("#eventLocation").value.trim();
+      state.event.theme = $("#eventTheme").value.trim();
+      state.event.hosts = $("#eventHosts").value.trim();
+      state.event.notes = $("#eventNotes").value.trim();
+      saveState();
+      renderSummary();
+    }
+
+    function addTask(){
+      const title = $("#taskTitle").value.trim();
+      if(!title) return;
+      state.tasks.unshift({
+        id:id(),
+        stage: $("#taskStage").value,
+        title,
+        owner: $("#taskOwner").value.trim(),
+        done:false,
+        notes:""
+      });
+      $("#taskTitle").value = "";
+      $("#taskOwner").value = "";
+      saveState();
+      renderAll();
+    }
+
+    function addGuest(){
+      const name = $("#guestName").value.trim();
+      if(!name) return;
+      state.guests.unshift({
+        id:id(),
+        name,
+        status: $("#guestStatus").value,
+        group:"",
+        plusOne:false,
+        adults:1,
+        children:0,
+        phone:"",
+        email:"",
+        menu:"",
+        allergies:"",
+        notes:""
+      });
+      $("#guestName").value = "";
+      saveState();
+      renderAll();
+    }
+
+    function addBudget(){
+      const category = $("#budgetCat").value.trim();
+      if(!category) return;
+      state.budget.unshift({
+        id:id(),
+        category,
+        planned:Number($("#budgetPlan").value || 0),
+        actual:Number($("#budgetAct").value || 0)
+      });
+      $("#budgetCat").value = "";
+      $("#budgetPlan").value = "";
+      $("#budgetAct").value = "";
+      saveState();
+      renderAll();
+    }
+
+    function addTimeline(){
+      const at = $("#timeAt").value;
+      const what = $("#timeWhat").value.trim();
+      if(!at || !what) return;
+      state.timeline.push({
+        id:id(),
+        at,
+        what,
+        duration:Number($("#timeDur").value || 0),
+        notes:""
+      });
+      $("#timeAt").value = "";
+      $("#timeWhat").value = "";
+      $("#timeDur").value = "";
+      saveState();
+      renderAll();
+    }
+
+    function addVendor(){
+      const name = $("#vName").value.trim();
+      if(!name) return;
+      state.vendors.unshift({
+        id:id(),
+        name,
+        service:$("#vService").value.trim(),
+        phone:"",
+        email:"",
+        status:"booked",
+        planned:0,
+        actual:0,
+        dueDate:"",
+        notes:""
+      });
+      $("#vName").value = "";
+      $("#vService").value = "";
+      saveState();
+      renderAll();
+    }
+
+    function statusLabel(status){
+      if(status === "yes") return t("yes");
+      if(status === "no") return t("no");
+      return t("pending");
+    }
+
+    function toggleTask(taskId){
+      const task = state.tasks.find(t=>t.id===taskId);
+      if(!task) return;
+      task.done = !task.done;
+      saveState();
+      renderAll();
+    }
+
+    function deleteTask(taskId){
+      state.tasks = state.tasks.filter(t=>t.id!==taskId);
+      saveState();
+      renderAll();
+    }
+
+    function deleteGuest(idv){
+      state.guests = state.guests.filter(x=>x.id!==idv);
+      saveState();
+      renderAll();
+    }
+
+    function deleteBudget(idv){
+      state.budget = state.budget.filter(x=>x.id!==idv);
+      saveState();
+      renderAll();
+    }
+
+    function deleteTimeline(idv){
+      state.timeline = state.timeline.filter(x=>x.id!==idv);
+      saveState();
+      renderAll();
+    }
+
+    function deleteVendor(idv){
+      state.vendors = state.vendors.filter(x=>x.id!==idv);
+      saveState();
+      renderAll();
+    }
+
+    function cycleGuestStatus(idv){
+      const g = state.guests.find(x=>x.id===idv);
+      if(!g) return;
+      g.status = g.status === "pending" ? "yes" : g.status === "yes" ? "no" : "pending";
+      saveState();
+      renderAll();
+    }
+
+    function openDrawer({title, fields, onSave}){
+      $("#drawerTitle").textContent = title;
+      const form = $("#drawerForm");
+      form.innerHTML = fields.map(f => {
+        if(f.type === "textarea"){
+          return `
+            <div style="margin-bottom:12px">
+              <label class="label">${esc(f.label)}</label>
+              <textarea class="input" data-k="${esc(f.key)}">${esc(f.value || "")}</textarea>
+            </div>
+          `;
+        }
+        if(f.type === "select"){
+          return `
+            <div style="margin-bottom:12px">
+              <label class="label">${esc(f.label)}</label>
+              <select class="input" data-k="${esc(f.key)}">
+                ${f.options.map(o=>`<option value="${esc(o.value)}" ${String(o.value)===String(f.value)?"selected":""}>${esc(o.label)}</option>`).join("")}
+              </select>
+            </div>
+          `;
+        }
+        return `
+          <div style="margin-bottom:12px">
+            <label class="label">${esc(f.label)}</label>
+            <input class="input" data-k="${esc(f.key)}" type="${esc(f.type || 'text')}" value="${esc(f.value || "")}" />
+          </div>
+        `;
+      }).join("");
+
+      $("#drawer").classList.add("open");
+      $("#drawer").setAttribute("aria-hidden", "false");
+
+      $("#drawerSave").onclick = () => {
+        const values = {};
+        form.querySelectorAll("[data-k]").forEach(el=>{
+          values[el.dataset.k] = el.value;
+        });
+        onSave(values);
+        closeDrawer();
+      };
+    }
+
+    function closeDrawer(){
+      $("#drawer").classList.remove("open");
+      $("#drawer").setAttribute("aria-hidden", "true");
+    }
+
+    function editTask(idv){
+      const x = state.tasks.find(t=>t.id===idv);
+      if(!x) return;
+      openDrawer({
+        title: t("details"),
+        fields: [
+          {key:"title", label: state.lang==="ro"?"Titlu":"Title", value:x.title},
+          {key:"owner", label: t("owner"), value:x.owner},
+          {key:"stage", label: state.lang==="ro"?"Etapă":"Stage", type:"select", value:x.stage, options:[
+            {value:"6m", label:stageLabel("6m")},
+            {value:"3m", label:stageLabel("3m")},
+            {value:"1m", label:stageLabel("1m")},
+            {value:"1w", label:stageLabel("1w")},
+            {value:"1d", label:stageLabel("1d")}
+          ]},
+          {key:"notes", label:t("notes"), type:"textarea", value:x.notes || ""}
+        ],
+        onSave: (v)=>{
+          x.title = v.title.trim();
+          x.owner = v.owner.trim();
+          x.stage = v.stage;
+          x.notes = v.notes.trim();
+          saveState(); renderAll();
+        }
+      });
+    }
+
+    function editGuest(idv){
+      const x = state.guests.find(g=>g.id===idv);
+      if(!x) return;
+      openDrawer({
+        title: t("details"),
+        fields: [
+          {key:"name", label: state.lang==="ro"?"Nume":"Name", value:x.name},
+          {key:"status", label:"RSVP", type:"select", value:x.status, options:[
+            {value:"pending", label:t("pending")},
+            {value:"yes", label:t("yes")},
+            {value:"no", label:t("no")}
+          ]},
+          {key:"group", label: state.lang==="ro"?"Grup":"Group", value:x.group || ""},
+          {key:"phone", label: state.lang==="ro"?"Telefon":"Phone", value:x.phone || ""},
+          {key:"email", label:"Email", value:x.email || ""},
+          {key:"menu", label: state.lang==="ro"?"Meniu":"Menu", value:x.menu || ""},
+          {key:"allergies", label: state.lang==="ro"?"Alergii":"Allergies", value:x.allergies || ""},
+          {key:"adults", label: state.lang==="ro"?"Adulți":"Adults", type:"number", value:x.adults ?? 1},
+          {key:"children", label: state.lang==="ro"?"Copii":"Children", type:"number", value:x.children ?? 0},
+          {key:"plusOne", label:"+1 (true/false)", value:String(x.plusOne)},
+          {key:"notes", label:t("notes"), type:"textarea", value:x.notes || ""}
+        ],
+        onSave: (v)=>{
+          x.name = v.name.trim();
+          x.status = v.status;
+          x.group = v.group.trim();
+          x.phone = v.phone.trim();
+          x.email = v.email.trim();
+          x.menu = v.menu.trim();
+          x.allergies = v.allergies.trim();
+          x.adults = Number(v.adults || 1);
+          x.children = Number(v.children || 0);
+          x.plusOne = String(v.plusOne).toLowerCase() === "true";
+          x.notes = v.notes.trim();
+          saveState(); renderAll();
+        }
+      });
+    }
+
+    function editBudget(idv){
+      const x = state.budget.find(b=>b.id===idv);
+      if(!x) return;
+      openDrawer({
+        title: t("details"),
+        fields: [
+          {key:"category", label: state.lang==="ro"?"Categorie":"Category", value:x.category},
+          {key:"planned", label:t("planned"), type:"number", value:x.planned},
+          {key:"actual", label:t("actual"), type:"number", value:x.actual}
+        ],
+        onSave: (v)=>{
+          x.category = v.category.trim();
+          x.planned = Number(v.planned || 0);
+          x.actual = Number(v.actual || 0);
+          saveState(); renderAll();
+        }
+      });
+    }
+
+    function editTimeline(idv){
+      const x = state.timeline.find(b=>b.id===idv);
+      if(!x) return;
+      openDrawer({
+        title: t("details"),
+        fields: [
+          {key:"at", label: state.lang==="ro"?"Ora":"Time", type:"time", value:x.at},
+          {key:"what", label: state.lang==="ro"?"Activitate":"Activity", value:x.what},
+          {key:"duration", label:t("duration"), type:"number", value:x.duration},
+          {key:"notes", label:t("notes"), type:"textarea", value:x.notes || ""}
+        ],
+        onSave: (v)=>{
+          x.at = v.at;
+          x.what = v.what.trim();
+          x.duration = Number(v.duration || 0);
+          x.notes = v.notes.trim();
+          saveState(); renderAll();
+        }
+      });
+    }
+
+    function editVendor(idv){
+      const x = state.vendors.find(b=>b.id===idv);
+      if(!x) return;
+      openDrawer({
+        title: t("details"),
+        fields: [
+          {key:"name", label: state.lang==="ro"?"Nume":"Name", value:x.name},
+          {key:"service", label: state.lang==="ro"?"Serviciu":"Service", value:x.service},
+          {key:"phone", label: state.lang==="ro"?"Telefon":"Phone", value:x.phone || ""},
+          {key:"email", label:"Email", value:x.email || ""},
+          {key:"status", label:"Status", value:x.status || "booked"},
+          {key:"planned", label:t("planned"), type:"number", value:x.planned},
+          {key:"actual", label:t("actual"), type:"number", value:x.actual},
+          {key:"dueDate", label: state.lang==="ro"?"Scadență":"Due date", type:"date", value:x.dueDate || ""},
+          {key:"notes", label:t("notes"), type:"textarea", value:x.notes || ""}
+        ],
+        onSave: (v)=>{
+          x.name = v.name.trim();
+          x.service = v.service.trim();
+          x.phone = v.phone.trim();
+          x.email = v.email.trim();
+          x.status = v.status.trim();
+          x.planned = Number(v.planned || 0);
+          x.actual = Number(v.actual || 0);
+          x.dueDate = v.dueDate;
+          x.notes = v.notes.trim();
+          saveState(); renderAll();
+        }
+      });
+    }
+
+    function exportJSON(){
+      const blob = new Blob([JSON.stringify(state, null, 2)], {type:"application/json"});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "event-planner-data.json";
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function importJSON(file){
+      const reader = new FileReader();
+      reader.onload = () => {
+        try{
+          const parsed = JSON.parse(reader.result);
+          state = mergeDefaults(defaultData(), parsed);
+          saveState();
+          renderAll();
+          alert(t("importedOk"));
+        }catch{
+          alert(t("invalidImport"));
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    function exportGuestsCSV(){
+      const rows = [
+        ["name","status","group","plusOne","adults","children","phone","email","menu","allergies","notes"],
+        ...state.guests.map(g => [
+          g.name, g.status, g.group || "", g.plusOne, g.adults ?? 1, g.children ?? 0,
+          g.phone || "", g.email || "", g.menu || "", g.allergies || "", g.notes || ""
+        ])
+      ];
+      const csv = rows.map(r => r.map(cell => `"${String(cell).replaceAll('"','""')}"`).join(",")).join("\\n");
+      const blob = new Blob([csv], {type:"text/csv;charset=utf-8;"});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "guests.csv";
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function exportICS(){
+      const dt = state.event.date ? new Date(state.event.date + "T12:00:00") : new Date();
+      const y = dt.getUTCFullYear();
+      const m = String(dt.getUTCMonth()+1).padStart(2,"0");
+      const d = String(dt.getUTCDate()).padStart(2,"0");
+      const stamp = `${y}${m}${d}T120000Z`;
+      const title = state.event.name || "Event Planner";
+      const loc = state.event.location || "";
+      const ics = [
+        "BEGIN:VCALENDAR",
+        "VERSION:2.0",
+        "PRODID:-//Event Planner//EN",
+        "BEGIN:VEVENT",
+        `UID:${Date.now()}@event-planner.local`,
+        `DTSTAMP:${stamp}`,
+        `DTSTART:${stamp}`,
+        `SUMMARY:${title.replaceAll(",","\\,")}`,
+        `LOCATION:${loc.replaceAll(",","\\,")}`,
+        "END:VEVENT",
+        "END:VCALENDAR"
+      ].join("\\r\\n");
+      const blob = new Blob([ics], {type:"text/calendar;charset=utf-8"});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "event.ics";
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function whatsappTemplate(name=""){
+      return state.lang === "ro"
+        ? `Salut${name ? " " + name : ""}! Te rugăm să confirmi participarea la ${state.event.name || "evenimentul nostru"}. Mulțumim!`
+        : `Hi${name ? " " + name : ""}! Please confirm your attendance for ${state.event.name || "our event"}. Thank you!`;
+    }
+
+    function openWABulk(){
+      const pending = state.guests.filter(g=>g.status==="pending");
+      $("#waList").innerHTML = pending.length ? pending.map(g=>{
+        const msg = encodeURIComponent(whatsappTemplate(g.name));
+        const url = `https://wa.me/?text=${msg}`;
+        return `
+          <div class="item">
+            <div class="itemTop">
+              <div>
+                <div class="itemTitle">${esc(g.name)}</div>
+                <div class="muted tiny">${esc(g.phone || "No phone saved")}</div>
+              </div>
+              <div class="itemActions">
+                <a class="btn ghost" href="${url}" target="_blank" rel="noopener">WhatsApp</a>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join("") : `<div class="empty">${state.lang==="ro" ? "Nu există invitați pending." : "No pending guests."}</div>`;
+
+      $("#waModal").classList.add("open");
+      $("#waModal").setAttribute("aria-hidden","false");
+    }
+
+    function closeWAModal(){
+      $("#waModal").classList.remove("open");
+      $("#waModal").setAttribute("aria-hidden","true");
+    }
+
+    async function copyText(str){
+      try{
+        await navigator.clipboard.writeText(str);
+        alert(t("copied"));
+      }catch{
+        prompt("Copy:", str);
+      }
+    }
+
+    function resetAll(){
+      if(!confirm(t("resetConfirm"))) return;
+      state = defaultData();
+      saveState();
+      renderAll();
+    }
+
+    window.toggleTask = toggleTask;
+    window.editTask = editTask;
+    window.deleteTask = deleteTask;
+    window.editGuest = editGuest;
+    window.deleteGuest = deleteGuest;
+    window.cycleGuestStatus = cycleGuestStatus;
+    window.editBudget = editBudget;
+    window.deleteBudget = deleteBudget;
+    window.editTimeline = editTimeline;
+    window.deleteTimeline = deleteTimeline;
+    window.editVendor = editVendor;
+    window.deleteVendor = deleteVendor;
+
+    function bindEvents(){
+      ["eventType","eventName","eventDate","eventLocation","eventTheme","eventHosts","eventNotes"]
+        .forEach(idv => $( "#" + idv ).addEventListener("input", syncEventFields));
+      $("#eventType").addEventListener("change", syncEventFields);
+
+      $("#addTask").addEventListener("click", addTask);
+      $("#addGuest").addEventListener("click", addGuest);
+      $("#addBudget").addEventListener("click", addBudget);
+      $("#addTime").addEventListener("click", addTimeline);
+      $("#addVendor").addEventListener("click", addVendor);
+
+      $("#taskFilter").addEventListener("change", e => { state.ui.taskFilter = e.target.value; saveState(); renderTasks(); });
+      $("#taskStatusFilter").addEventListener("change", e => { state.ui.taskStatusFilter = e.target.value; saveState(); renderTasks(); });
+      $("#taskSearch").addEventListener("input", e => { state.ui.taskSearch = e.target.value; saveState(); renderTasks(); });
+
+      $("#guestSearch").addEventListener("input", e => { state.ui.guestSearch = e.target.value; saveState(); renderGuests(); });
+      $("#guestSort").addEventListener("change", e => { state.ui.guestSort = e.target.value; saveState(); renderGuests(); });
+
+      $("#btnSave").addEventListener("click", ()=>{ syncEventFields(); saveState(); renderAll(); });
+      $("#btnExport").addEventListener("click", exportJSON);
+      $("#fileImport").addEventListener("change", e => { if(e.target.files[0]) importJSON(e.target.files[0]); });
+      $("#btnGuestsCSV").addEventListener("click", exportGuestsCSV);
+      $("#btnPrint").addEventListener("click", ()=>window.print());
+      $("#btnICS").addEventListener("click", exportICS);
+      $("#btnShare").addEventListener("click", ()=>alert(t("shareSoon")));
+      $("#btnReset").addEventListener("click", resetAll);
+
+      $("#btnWABulk").addEventListener("click", openWABulk);
+      $("#btnWA").addEventListener("click", ()=>copyText(whatsappTemplate()));
+      $("#waClose").addEventListener("click", closeWAModal);
+      $("#waDone").addEventListener("click", closeWAModal);
+      $("#waCopyMsg").addEventListener("click", ()=>copyText(whatsappTemplate()));
+      $("#waCopyAll").addEventListener("click", ()=>{
+        const links = state.guests
+          .filter(g=>g.status==="pending")
+          .map(g => `https://wa.me/?text=${encodeURIComponent(whatsappTemplate(g.name))}`)
+          .join("\\n");
+        copyText(links || "");
+      });
+
+      $("#drawerX").addEventListener("click", closeDrawer);
+      $("#drawerCancel").addEventListener("click", closeDrawer);
+      document.addEventListener("click", (e)=>{
+        if(e.target.matches("[data-close='1']")) {
+          closeDrawer();
+          closeWAModal();
+        }
+      });
+
+      $("#btnLangRO").addEventListener("click", ()=>{
+        state.lang = "ro";
+        saveState();
+        renderAll();
+      });
+      $("#btnLangEN").addEventListener("click", ()=>{
+        state.lang = "en";
+        saveState();
+        renderAll();
+      });
+
+      $("#btnTheme").addEventListener("click", ()=>{
+        state.theme = state.theme === "dark" ? "light" : "dark";
+        saveState();
+        renderAll();
+      });
+
+      $("#mobileQuickTask").addEventListener("click", ()=>{
+        $("#taskTitle").focus();
+        window.scrollTo({top: $("#tasksTitle").getBoundingClientRect().top + window.scrollY - 80, behavior:"smooth"});
+      });
+
+      $("#mobileQuickGuest").addEventListener("click", ()=>{
+        $("#guestName").focus();
+        window.scrollTo({top: $("#guestsTitle").getBoundingClientRect().top + window.scrollY - 80, behavior:"smooth"});
+      });
+    }
+
+    renderAll();
+    bindEvents();
+    saveState();
+  </script>
+</body>
+</html>
